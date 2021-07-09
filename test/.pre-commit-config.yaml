@@ -4,6 +4,6 @@
 ---
 repos:
   - repo: https://github.com/Skeen/kustomize-validate
-    rev: 0f5ad7f98d4688d3b9daea1b5d81610e2a29d8df
+    rev: 28971d30649b815cade7965525b7ca2ed619b974
     hooks:
       - id: yaml-parsable

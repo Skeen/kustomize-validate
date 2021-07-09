@@ -1,10 +1,17 @@
 # SPDX-FileCopyrightText: Magenta ApS
 #
 # SPDX-License-Identifier: MPL-2.0
-
+---
 - id: yaml-parsable
   name: yaml-parsable
   description: Check YAML files are parsable
   entry: pre_commit_hooks/yaml-parsable.sh
+  language: script
+  types: [file, yaml]
+
+- id: flux-lint
+  name: flux-lint
+  description: Check flux resource validate according to Flux OpenAPI schemas
+  entry: pre_commit_hooks/flux-lint.sh
   language: script
   types: [file, yaml]
