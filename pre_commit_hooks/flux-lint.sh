@@ -64,10 +64,7 @@ fi
 
 for FILE in "$@"; do
     if [[ "${FILE}" =~ ^clusters.* ]]; then
-        kubeval "${FILE}" "${KUBEVAL_FLAGS[@]}"
-        if [[ ${PIPESTATUS[0]} != 0 ]]; then
-            exit 1
-        fi
+        kubeval "${FILE}" "${KUBEVAL_FLAGS[@]}" | grep -v "^PASS -"
     fi
 done
 
@@ -77,9 +74,8 @@ KUSTOMIZE_CONFIG="kustomization.yaml"
 
 for FILE in "$@"; do
     if [[ "${FILE}" =~ ^.*${KUSTOMIZE_CONFIG} ]]; then
-        kustomize build "${FILE%${KUSTOMIZE_CONFIG}}" "${KUSTOMIZE_FLAGS[@]}" | kubeval "${KUBEVAL_FLAGS[@]}"
-        if [[ ${PIPESTATUS[0]} != 0 ]]; then
-            exit 1
-        fi
+        kustomize build "${FILE%${KUSTOMIZE_CONFIG}}" "${KUSTOMIZE_FLAGS[@]}" | kubeval "${KUBEVAL_FLAGS[@]}" | grep -v "^PASS -"
     fi
 done
+
+exit 0
