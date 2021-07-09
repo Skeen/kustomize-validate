@@ -1,0 +1,3 @@
+- repo: https://github.com/Skeen/kustomize-validate
+  hooks:
+  - id: yaml-parsable

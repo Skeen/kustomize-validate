@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+
+if ! command which yq &>/dev/null; then
+  >&2 echo 'yq command not found'
+  exit 1
+fi
+
+for FILE in "$@"; do
+    yq e 'true' "${FILE}" > /dev/null
+done
