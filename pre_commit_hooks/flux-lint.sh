@@ -42,26 +42,42 @@ if ! command which kustomize &>/dev/null; then
   exit 1
 fi
 
-# Download Flux OpenAPI schemas
-mkdir -p /tmp/flux-crd-schemas/master-standalone-strict
-curl -sL https://github.com/fluxcd/flux2/releases/latest/download/crd-schemas.tar.gz | tar zxf - -C /tmp/flux-crd-schemas/master-standalone-strict
+SCHEMA_FOLDER=/tmp/flux-crd-schemas/master-standalone-strict
+SCHEMA_URL=https://github.com/fluxcd/flux2/releases/latest/download/crd-schemas.tar.gz
+if [ ! -d "${SCHEMA_FOLDER}" ]; then
+    # Download Flux OpenAPI schemas
+    mkdir -p "${SCHEMA_FOLDER}"
+    curl -sL "${SCHEMA_URL}" | tar zxf - -C "${SCHEMA_FOLDER}"
+fi
 
-# Mirror kustomize-controller build options
-KUSTOMIZE_FLAGS=(--load-restrictor=LoadRestrictionsNone --reorder=legacy)
-KUSTOMIZE_CONFIG="kustomization.yaml"
+KUBEVAL_FLAGS=(--additional-schema-locations=file:///tmp/flux-crd-schemas)
+
+STRICT=${STRICT:=1}
+if [[ ${STRICT} -eq 1 ]]; then
+    KUBEVAL_FLAGS+=("--strict")
+fi
+
+IGNORE_MISSING=${IGNORE_MISSING:=1}
+if [[ ${IGNORE_MISSING} -eq 1 ]]; then
+    KUBEVAL_FLAGS+=("--ignore-missing-schemas")
+fi
 
 for FILE in "$@"; do
     if [[ "${FILE}" =~ ^clusters.* ]]; then
-        kubeval "${FILE}" --strict --ignore-missing-schemas --additional-schema-locations=file:///tmp/flux-crd-schemas
+        kubeval "${FILE}" "${KUBEVAL_FLAGS[@]}"
         if [[ ${PIPESTATUS[0]} != 0 ]]; then
             exit 1
         fi
     fi
 done
 
+# Mirror kustomize-controller build options
+KUSTOMIZE_FLAGS=(--load-restrictor=LoadRestrictionsNone --reorder=legacy)
+KUSTOMIZE_CONFIG="kustomization.yaml"
+
 for FILE in "$@"; do
     if [[ "${FILE}" =~ ^.*${KUSTOMIZE_CONFIG} ]]; then
-        kustomize build ${FILE} "${KUSTOMIZE_FLAGS[@]}" | kubeval --strict --ignore-missing-schemas --additional-schema-locations=file:///tmp/flux-crd-schemas
+        kustomize build "${FILE}" "${KUSTOMIZE_FLAGS[@]}" | kubeval "${KUBEVAL_FLAGS[@]}"
         if [[ ${PIPESTATUS[0]} != 0 ]]; then
             exit 1
         fi
