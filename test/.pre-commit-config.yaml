@@ -4,7 +4,7 @@
 ---
 repos:
   - repo: https://github.com/Skeen/pre-commit-flux-lint
-    rev: 03447dc8a7657477d614015e7ba7614ebb42f17b
+    rev: 7a98858b86a8110fa6054b280e6d47deee3f5c99
     hooks:
       - id: yaml-parsable
       - id: flux-lint
