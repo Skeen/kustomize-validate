@@ -74,7 +74,14 @@ KUSTOMIZE_CONFIG="kustomization.yaml"
 
 for FILE in "$@"; do
     if [[ "${FILE}" =~ ^.*${KUSTOMIZE_CONFIG} ]]; then
-        kustomize build "${FILE%${KUSTOMIZE_CONFIG}}" "${KUSTOMIZE_FLAGS[@]}" | kubeval "${KUBEVAL_FLAGS[@]}" | grep -v "^PASS -"
+        BUILD_FOLDER=$(mktemp -d)
+        kustomize build "${FILE%${KUSTOMIZE_CONFIG}}" "${KUSTOMIZE_FLAGS[@]}" -o ${BUILD_FOLDER}
+        for FILE in ${BUILD_FOLDER}/*.yaml; do
+            # Ignore encrypted files
+            yq e "del(.sops)" "${FILE}" > ${FILE}.yq.yaml
+            kubeval "${FILE}.yq.yaml" "${KUBEVAL_FLAGS[@]}" | grep -v "^PASS -"
+        done
+        rm -rf "${BUILD_FOLDER}"
     fi
 done
 

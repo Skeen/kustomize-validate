@@ -13,5 +13,5 @@ if ! command which yq &>/dev/null; then
 fi
 
 for FILE in "$@"; do
-    yq e 'true' "${FILE}" > /dev/null
+    yq -e e 'true' "${FILE}" > /dev/null
 done
