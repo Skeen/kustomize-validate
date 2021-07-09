@@ -1,3 +1,9 @@
-- repo: https://github.com/Skeen/kustomize-validate
-  hooks:
-  - id: yaml-parsable
+# SPDX-FileCopyrightText: Magenta ApS
+#
+# SPDX-License-Identifier: MPL-2.0
+---
+repos:
+  - repo: https://github.com/Skeen/kustomize-validate
+    rev: 0f5ad7f98d4688d3b9daea1b5d81610e2a29d8df
+    hooks:
+      - id: yaml-parsable
