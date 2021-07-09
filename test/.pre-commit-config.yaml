@@ -3,7 +3,8 @@
 # SPDX-License-Identifier: MPL-2.0
 ---
 repos:
-  - repo: https://github.com/Skeen/kustomize-validate
-    rev: 28971d30649b815cade7965525b7ca2ed619b974
+  - repo: https://github.com/Skeen/pre-commit-flux-lint
+    rev: 03447dc8a7657477d614015e7ba7614ebb42f17b
     hooks:
       - id: yaml-parsable
+      - id: flux-lint
