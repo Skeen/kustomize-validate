@@ -51,22 +51,18 @@ KUSTOMIZE_FLAGS=(--load-restrictor=LoadRestrictionsNone --reorder=legacy)
 KUSTOMIZE_CONFIG="kustomization.yaml"
 
 for FILE in "$@"; do
-    if [[ $FILE == "clusters*" ]]; then
-        echo "INFO - Validating $FILE"
+    if [[ "${FILE}" =~ ^clusters.* ]]; then
         kubeval "${FILE}" --strict --ignore-missing-schemas --additional-schema-locations=file:///tmp/flux-crd-schemas
         if [[ ${PIPESTATUS[0]} != 0 ]]; then
-            echo "Invalid: ${FILE}"
             exit 1
         fi
     fi
 done
 
 for FILE in "$@"; do
-    if [[ $FILE == "*${KUSTOMIZE_CONFIG}" ]]; then
-        echo "INFO - Validating kustomization $FILE"
+    if [[ "${FILE}" =~ ^.*${KUSTOMIZE_CONFIG} ]]; then
         kustomize build ${FILE} "${KUSTOMIZE_FLAGS[@]}" | kubeval --strict --ignore-missing-schemas --additional-schema-locations=file:///tmp/flux-crd-schemas
         if [[ ${PIPESTATUS[0]} != 0 ]]; then
-            echo "Invalid: ${FILE}"
             exit 1
         fi
     fi
